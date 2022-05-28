@@ -815,6 +815,7 @@ def: Flag<["-"], "d">;
 def: Flag<["-"], "g">;
 def: F<"long-plt">;
 def: FF<"no-add-needed">;
+def: F<"copy-dt-needed-entries">;
 def: F<"no-copy-dt-needed-entries">;
 def: F<"no-ctors-in-init-array">;
 def: F<"no-keep-memory">;
