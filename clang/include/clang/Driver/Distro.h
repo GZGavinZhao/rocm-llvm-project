@@ -48,6 +48,7 @@ public:
     Fedora,
     Gentoo,
     OpenSUSE,
+    Solus,
     UbuntuHardy,
     UbuntuIntrepid,
     UbuntuJaunty,
@@ -141,6 +142,8 @@ public:
   bool IsAlpineLinux() const { return DistroVal == AlpineLinux; }
 
   bool IsGentoo() const { return DistroVal == Gentoo; }
+
+  bool IsSolus() const { return DistroVal == Solus;}
 
   /// @}
 };
