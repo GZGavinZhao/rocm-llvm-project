@@ -7092,7 +7092,7 @@ def fbinutils_version_EQ : Joined<["-"], "fbinutils-version=">,
   HelpText<"Produced object files can use all ELF features supported by this "
   "binutils version and newer. If -fno-integrated-as is specified, the "
   "generated assembly will consider GNU as support. 'none' means that all ELF "
-  "features can be used, regardless of binutils support. Defaults to 2.26.">;
+  "features can be used, regardless of binutils support. Defaults to 2.42.">;
 def fuse_ld_EQ : Joined<["-"], "fuse-ld=">, Group<f_Group>,
   Flags<[LinkOption]>, Visibility<[ClangOption, FlangOption, CLOption]>;
 def ld_path_EQ : Joined<["--"], "ld-path=">, Group<Link_Group>;

@@ -407,7 +407,7 @@ protected:
   // this binutils version and later. INT_MAX means all features can be used,
   // regardless of GNU ld support. The default value is referenced by
   // clang/Driver/Options.td.
-  std::pair<int, int> BinutilsVersion = {2, 26};
+  std::pair<int, int> BinutilsVersion = {2, 42};
 
   /// Should we use the integrated assembler?
   /// The integrated assembler should be enabled by default (by the
