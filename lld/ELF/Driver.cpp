@@ -969,7 +969,7 @@ static std::pair<BuildIdKind, SmallVector<uint8_t, 0>>
 getBuildId(Ctx &ctx, opt::InputArgList &args) {
   auto *arg = args.getLastArg(OPT_build_id);
   if (!arg)
-    return {BuildIdKind::None, {}};
+    return {BuildIdKind::Sha1, {}};
 
   StringRef s = arg->getValue();
   if (s == "fast")
@@ -985,7 +985,7 @@ getBuildId(Ctx &ctx, opt::InputArgList &args) {
 
   if (s != "none")
     ErrAlways(ctx) << "unknown --build-id style: " << s;
-  return {BuildIdKind::None, {}};
+  return {BuildIdKind::Sha1, {}};
 }
 
 static std::pair<bool, bool> getPackDynRelocs(Ctx &ctx,

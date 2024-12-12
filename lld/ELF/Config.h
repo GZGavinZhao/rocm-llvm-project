@@ -437,7 +437,7 @@ struct Config {
   GcsPolicy zGcs;
   bool power10Stubs;
   ARMVFPArgKind armVFPArgs = ARMVFPArgKind::Default;
-  BuildIdKind buildId = BuildIdKind::None;
+  BuildIdKind buildId = BuildIdKind::Sha1;
   SeparateSegmentKind zSeparate;
   ELFKind ekind = ELFNoneKind;
   uint16_t emachine = llvm::ELF::EM_NONE;
