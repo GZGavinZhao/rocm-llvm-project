@@ -318,7 +318,7 @@ set(CLANG_SYSTEMZ_DEFAULT_ARCH "z10" CACHE STRING "SystemZ Default Arch")
 set(CLANG_VENDOR ${PACKAGE_VENDOR} CACHE STRING
   "Vendor-specific text for showing with version information.")
 
-set(CLANG_REPOSITORY_STRING "" CACHE STRING
+set(CLANG_REPOSITORY_STRING "@@SOLUS_VERSION_STRING@@" CACHE STRING
   "Vendor-specific text for showing the repository the source is taken from.")
 
 if(CLANG_REPOSITORY_STRING)
