@@ -1246,10 +1246,10 @@ static DebugCompressionType getCompressionType(Ctx &ctx, StringRef s,
                                                StringRef option) {
   DebugCompressionType type = StringSwitch<DebugCompressionType>(s)
                                   .Case("zlib", DebugCompressionType::Zlib)
-                                  .Case("zstd", DebugCompressionType::Zstd)
-                                  .Default(DebugCompressionType::None);
-  if (type == DebugCompressionType::None) {
-    if (s != "none")
+                                  .Case("none", DebugCompressionType::None)
+                                  .Default(DebugCompressionType::Zstd);
+  if (type == DebugCompressionType::Zstd) {
+    if (s != "zstd")
       ErrAlways(ctx) << "unknown " << option << " value: " << s;
   } else if (const char *reason = compression::getReasonIfUnsupported(
                  compression::formatFor(type))) {

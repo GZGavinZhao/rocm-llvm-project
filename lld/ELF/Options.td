@@ -68,7 +68,7 @@ defm check_sections: B<"check-sections",
     "Do not check section addresses for overlaps">;
 
 defm compress_debug_sections:
-  Eq<"compress-debug-sections", "Compress DWARF debug sections">,
+  Eq<"compress-debug-sections", "Compress DWARF debug sections (default: zstd)">,
   MetaVarName<"[none,zlib,zstd]">;
 
 defm compress_sections: EEq<"compress-sections",

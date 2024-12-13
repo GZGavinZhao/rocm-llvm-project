@@ -7858,9 +7858,9 @@ def dwarf_debug_flags : Separate<["-"], "dwarf-debug-flags">,
 def compress_debug_sections_EQ : Joined<["-", "--"], "compress-debug-sections=">,
     HelpText<"DWARF debug sections compression type">, Values<"none,zlib,zstd">,
     NormalizedValuesScope<"llvm::DebugCompressionType">, NormalizedValues<["None", "Zlib", "Zstd"]>,
-    MarshallingInfoEnum<CodeGenOpts<"CompressDebugSections">, "None">;
+    MarshallingInfoEnum<CodeGenOpts<"CompressDebugSections">, "Zstd">;
 def compress_debug_sections : Flag<["-", "--"], "compress-debug-sections">,
-  Alias<compress_debug_sections_EQ>, AliasArgs<["zlib"]>;
+  Alias<compress_debug_sections_EQ>, AliasArgs<["zstd"]>;
 def mno_exec_stack : Flag<["-"], "mnoexecstack">,
   HelpText<"Mark the file as not needing an executable stack">,
   MarshallingInfoFlag<CodeGenOpts<"NoExecStack">>;

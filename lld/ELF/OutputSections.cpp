@@ -374,9 +374,9 @@ template <class ELFT> void OutputSection::maybeCompress(Ctx &ctx) {
   DebugCompressionType ctype = DebugCompressionType::None;
   size_t compressedSize = sizeof(Elf_Chdr);
   unsigned level = 0; // default compression level
-  if (!(flags & SHF_ALLOC) && ctx.arg.compressDebugSections &&
+  if (!(flags & SHF_ALLOC) &&
       name.starts_with(".debug_"))
-    ctype = *ctx.arg.compressDebugSections;
+    ctype = ctx.arg.compressDebugSections;
   for (auto &[glob, t, l] : ctx.arg.compressSections)
     if (glob.match(name))
       std::tie(ctype, level) = {t, l};

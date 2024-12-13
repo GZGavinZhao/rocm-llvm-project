@@ -104,7 +104,7 @@ struct AssemblerInvocation {
   std::string DebugCompilationDir;
   llvm::SmallVector<std::pair<std::string, std::string>, 0> DebugPrefixMap;
   llvm::DebugCompressionType CompressDebugSections =
-      llvm::DebugCompressionType::None;
+      llvm::DebugCompressionType::Zstd;
   std::string MainFileName;
   std::string SplitDwarfOutput;
 
@@ -296,7 +296,7 @@ bool AssemblerInvocation::CreateFromArgs(AssemblerInvocation &Opts,
             .Case("none", llvm::DebugCompressionType::None)
             .Case("zlib", llvm::DebugCompressionType::Zlib)
             .Case("zstd", llvm::DebugCompressionType::Zstd)
-            .Default(llvm::DebugCompressionType::None);
+            .Default(llvm::DebugCompressionType::Zstd);
   }
 
   if (auto *DwarfFormatArg = Args.getLastArg(OPT_gdwarf64, OPT_gdwarf32))
