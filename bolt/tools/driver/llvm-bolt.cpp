@@ -17,6 +17,7 @@
 #include "bolt/Rewrite/RewriteInstance.h"
 #include "bolt/Utils/CommandLineOpts.h"
 #include "llvm/MC/TargetRegistry.h"
+#include "llvm/Mimalloc/Mimalloc.h"
 #include "llvm/Object/Binary.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Errc.h"
@@ -177,6 +178,8 @@ int main(int argc, char **argv) {
   // Print a stack trace if we signal out.
   sys::PrintStackTraceOnErrorSignal(argv[0]);
   PrettyStackTraceProgram X(argc, argv);
+
+  llvm::mimalloc::set_mimalloc_options();
 
   llvm_shutdown_obj Y; // Call llvm_shutdown() on exit.
 

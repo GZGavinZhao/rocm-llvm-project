@@ -19,6 +19,8 @@ add_llvm_tool(llvm-ar
   GENERATE_DRIVER
   )
 
+target_link_libraries(llvm-ar PRIVATE LLVMMimalloc)
+
 add_llvm_tool_symlink(llvm-ranlib llvm-ar)
 add_llvm_tool_symlink(llvm-lib llvm-ar)
 add_llvm_tool_symlink(llvm-dlltool llvm-ar)

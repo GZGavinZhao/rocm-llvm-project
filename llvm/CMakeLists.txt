@@ -621,6 +621,8 @@ set(LLVM_ENABLE_ICU "OFF" CACHE STRING "Use ICU for text encoding conversion sup
 
 set(LLVM_ENABLE_ICONV "OFF" CACHE STRING "Use iconv for text encoding conversion support if available. Can be ON, OFF, or FORCE_ON")
 
+set(LLVM_ENABLE_MIMALLOC "ON" CACHE STRING "Use mimalloc for memory allocations. Can be ON, OFF, or FORCE_ON")
+
 set(LLVM_ENABLE_ZLIB "ON" CACHE STRING "Use zlib for compression/decompression if available. Can be ON, OFF, or FORCE_ON")
 
 set(LLVM_ENABLE_ZSTD "ON" CACHE STRING "Use zstd for compression/decompression if available. Can be ON, OFF, or FORCE_ON")

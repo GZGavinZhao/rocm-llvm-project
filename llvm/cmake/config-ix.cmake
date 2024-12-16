@@ -162,6 +162,23 @@ if(HAVE_LIBPTHREAD)
   set(LLVM_PTHREAD_LIB ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
+# Mimalloc will set the PACKAGE_VERSION in it's cmake files, which breaks other parts of the build.
+# Temporarily store the current value and set it back afterwards.
+set(TEMP_VERSION ${PACKAGE_VERSION})
+set(mimalloc_FOUND 0)
+if(LLVM_ENABLE_MIMALLOC)
+  if(LLVM_ENABLE_MIMALLOC STREQUAL FORCE_ON)
+    find_package(mimalloc REQUIRED)
+    if(NOT mimalloc_FOUND)
+      message(FATAL_ERROR "Failed to configure mimalloc, but LLVM_ENABLE_MIMALLOC is FORCE_ON")
+    endif()
+  elseif(NOT LLVM_USE_SANITIZER MATCHES "Memory.*")
+    find_package(mimalloc QUIET)
+  endif()
+endif()
+set(LLVM_ENABLE_MIMALLOC ${mimalloc_FOUND})
+set(PACKAGE_VERSION ${TEMP_VERSION})
+
 if(LLVM_ENABLE_ZLIB)
   if(LLVM_ENABLE_ZLIB STREQUAL FORCE_ON)
     find_package(ZLIB REQUIRED)

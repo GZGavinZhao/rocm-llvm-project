@@ -97,6 +97,9 @@
 /* Define if we have cpp-httplib and want to use it */
 #cmakedefine LLVM_ENABLE_HTTPLIB ${LLVM_ENABLE_HTTPLIB}
 
+/* Define if mimalloc is available */
+#cmakedefine01 LLVM_ENABLE_MIMALLOC
+
 /* Define if zlib compression is available */
 #cmakedefine01 LLVM_ENABLE_ZLIB
 

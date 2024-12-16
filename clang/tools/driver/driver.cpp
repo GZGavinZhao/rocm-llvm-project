@@ -30,6 +30,7 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/Config/llvm-config.h" // for LLVM_ON_UNIX
+#include "llvm/Mimalloc/Mimalloc.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
@@ -244,6 +245,7 @@ static int ExecuteCC1Tool(SmallVectorImpl<const char *> &ArgV,
 
 int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
   noteBottomOfStack();
+  llvm::mimalloc::set_mimalloc_options();
   llvm::setBugReportMsg("PLEASE submit a bug report to " BUG_REPORT_URL
                         " and include the crash backtrace, preprocessed "
                         "source, and associated run script.\n");

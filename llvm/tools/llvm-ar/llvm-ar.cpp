@@ -18,6 +18,7 @@
 #include "llvm/Object/Archive.h"
 #include "llvm/Object/ArchiveWriter.h"
 #include "llvm/Object/SymbolicFile.h"
+#include "llvm/Mimalloc/Mimalloc.h"
 #include "llvm/Support/Chrono.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/ConvertUTF.h"
@@ -1510,6 +1511,8 @@ static int ranlib_main(int argc, char **argv) {
 
 int llvm_ar_main(int argc, char **argv, const llvm::ToolContext &) {
   ToolName = argv[0];
+
+  llvm::mimalloc::set_mimalloc_options();
 
   llvm::InitializeAllTargetInfos();
   llvm::InitializeAllTargetMCs();

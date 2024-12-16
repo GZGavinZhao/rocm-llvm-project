@@ -34,6 +34,11 @@ lld_target_link_libraries(lld
   lldWasm
   )
 
+target_link_libraries(lld
+  PRIVATE
+  LLVMMimalloc
+  )
+
 if(NOT LLD_SYMLINKS_TO_CREATE)
   set(LLD_SYMLINKS_TO_CREATE
       lld-link ld.lld ld64.lld wasm-ld)

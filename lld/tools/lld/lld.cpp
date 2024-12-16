@@ -31,6 +31,7 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/Twine.h"
+#include "llvm/Mimalloc/Mimalloc.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/CrashRecoveryContext.h"
 #include "llvm/Support/LLVMDriver.h"
@@ -73,6 +74,7 @@ LLD_HAS_DRIVER(macho)
 LLD_HAS_DRIVER(wasm)
 
 int lld_main(int argc, char **argv, const llvm::ToolContext &) {
+  llvm::mimalloc::set_mimalloc_options();
   sys::Process::UseANSIEscapeCodes(true);
 
   if (::getenv("FORCE_LLD_DIAGNOSTICS_CRASH")) {

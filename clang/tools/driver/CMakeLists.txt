@@ -65,6 +65,11 @@ clang_target_link_libraries(clang
   clangFrontendTool
   clangSerialization
   )
+ 
+target_link_libraries(clang
+  PRIVATE
+  LLVMMimalloc
+  )
 
 if(WIN32 AND NOT CYGWIN)
   # Prevent versioning if the buildhost is targeting for Win32.

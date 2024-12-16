@@ -25,6 +25,7 @@ target_link_libraries(llvm-bolt
   LLVMBOLTProfile
   LLVMBOLTRewrite
   LLVMBOLTUtils
+  LLVMMimalloc
   )
 
 add_bolt_tool_symlink(perf2bolt llvm-bolt)
