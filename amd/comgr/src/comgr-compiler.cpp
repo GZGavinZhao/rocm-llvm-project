@@ -43,6 +43,7 @@
 #include "comgr-diagnostic-handler.h"
 #include "comgr-env.h"
 #include "comgr-spirv-command.h"
+#include "comgr-metadata.h"
 #include "lld/Common/CommonLinkerContext.h"
 #include "lld/Common/Driver.h"
 #include "clang/Basic/Version.h"
@@ -1299,9 +1300,63 @@ amd_comgr_status_t AMDGPUCompiler::unbundle() {
     size_t Index = OutputPrefix.find_last_of(".");
     OutputPrefix = OutputPrefix.substr(0, Index);
 
+    std::set<std::string> CoEntryIds;
+    if (auto Error = OffloadBundler::GetBundleIDsInFile(InputFilePath, BundlerConfig, CoEntryIds)) {
+      if (env::shouldEmitVerboseLogs()) {
+        LogS << "Failed to get bundle IDs in "
+             << InputFilePath
+             << ", not trying to coerce compatible archs\n";
+        LogS.flush();
+      }
+    }
+    std::set<std::pair<std::string, std::string>> entry_ids_with_idents;
+    for (const auto& CoEntryId : CoEntryIds) {
+      std::string TargetIdent;
+      size_t Pos = std::string::npos;
+      for (const auto& Prefix : {"hipv4-", "hip-"}) {
+        if ((Pos = CoEntryId.find(Prefix)) == 0) {
+          TargetIdent = CoEntryId.substr(std::char_traits<char>::length(Prefix));
+          break;
+        }
+      }
+
+      if (TargetIdent.empty()) {
+        continue;
+      }
+
+      entry_ids_with_idents.emplace(CoEntryId, TargetIdent);
+    }
+
     // Bundler target and output names
     for (StringRef Entry : ActionInfo->BundleEntryIDs) {
-      BundlerConfig.TargetNames.emplace_back(Entry);
+      std::string CompatEntry = Entry.str();
+
+      std::string EntryIdent;
+      size_t Pos = std::string::npos;
+      for (const auto& Prefix : {"hipv4-", "hip-"}) {
+        if ((Pos = Entry.find(Prefix)) == 0) {
+          EntryIdent = Entry.substr(std::char_traits<char>::length(Prefix));
+          break;
+        }
+      }
+
+      if (!EntryIdent.empty()) {
+        std::string BestEntry;
+        for (const auto& [CoEntry, CoIdent] : entry_ids_with_idents) {
+          if (EntryIdent == CoIdent) {
+            BestEntry = CoEntry;
+            break;
+          } else if (metadata::isCompatibleIsaName(EntryIdent, CoIdent)) {
+            BestEntry = CoEntry;
+          }
+        }
+
+        if (!BestEntry.empty()) {
+          CompatEntry = BestEntry;
+        }
+      }
+
+      BundlerConfig.TargetNames.emplace_back(CompatEntry);
 
       SmallString<128> OutputFilePath = OutputDir;
       sys::path::append(OutputFilePath,
