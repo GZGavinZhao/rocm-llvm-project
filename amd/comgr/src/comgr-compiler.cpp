@@ -20,6 +20,7 @@
 #include "comgr-env.h"
 #include "comgr-spirv-command.h"
 #include "comgr-unbundle-command.h"
+#include "comgr-metadata.h"
 #include "lld/Common/CommonLinkerContext.h"
 #include "lld/Common/Driver.h"
 #include "clang/CodeGen/CodeGenAction.h"
@@ -1378,17 +1379,72 @@ amd_comgr_status_t AMDGPUCompiler::unbundle() {
            << "   Unbundled Files Extension: ." << FileExtension << "\n";
     }
 
+    std::set<std::string> CoEntryIds;
+    if (auto Error = OffloadBundler::GetBundleIDsInFile(InputFilePath, BundlerConfig, CoEntryIds)) {
+      if (env::shouldEmitVerboseLogs()) {
+        LogS << "Failed to get bundle IDs in "
+             << InputFilePath
+             << ", not trying to coerce compatible archs\n";
+        LogS.flush();
+      }
+    }
+    std::set<std::pair<std::string, std::string>> entry_ids_with_idents;
+    for (const auto& CoEntryId : CoEntryIds) {
+      std::string TargetIdent;
+      size_t Pos = std::string::npos;
+      for (const auto& Prefix : {"hipv4-", "hip-"}) {
+        if ((Pos = CoEntryId.find(Prefix)) == 0) {
+          TargetIdent = CoEntryId.substr(std::char_traits<char>::length(Prefix));
+          break;
+        }
+      }
+
+      if (TargetIdent.empty()) {
+        continue;
+      }
+
+      entry_ids_with_idents.emplace(CoEntryId, TargetIdent);
+    }
+
+    // Bundler target and output names
     for (StringRef Entry : ActionInfo->BundleEntryIDs) {
+      std::string CompatEntry = Entry.str();
+
+      std::string EntryIdent;
+      size_t Pos = std::string::npos;
+      for (const auto& Prefix : {"hipv4-", "hip-"}) {
+        if ((Pos = Entry.find(Prefix)) == 0) {
+          EntryIdent = Entry.substr(std::char_traits<char>::length(Prefix));
+          break;
+        }
+      }
+
+      if (!EntryIdent.empty()) {
+        std::string BestEntry;
+        for (const auto& [CoEntry, CoIdent] : entry_ids_with_idents) {
+          if (EntryIdent == CoIdent) {
+            BestEntry = CoEntry;
+            break;
+          } else if (metadata::isCompatibleIsaName(EntryIdent, CoIdent)) {
+            BestEntry = CoEntry;
+          }
+        }
+
+        if (!BestEntry.empty()) {
+          CompatEntry = BestEntry;
+        }
+      }
+
       // Add an output file for each target
       SmallString<128> OutputFilePath = OutputDir;
       sys::path::append(OutputFilePath,
-                        OutputPrefix + "-" + Entry + "." + FileExtension);
+                        OutputPrefix + "-" + CompatEntry + "." + FileExtension);
 
-      BundlerConfig.TargetNames.emplace_back(Entry);
+      BundlerConfig.TargetNames.emplace_back(CompatEntry);
       BundlerConfig.OutputFileNames.emplace_back(OutputFilePath);
 
       if (env::shouldEmitVerboseLogs()) {
-        LogS << "\tBundle Entry ID: " << Entry << "\n"
+        LogS << "\tBundle (Compat)Entry ID: " << CompatEntry << "\n"
              << "\tOutput Filename: " << OutputFilePath << "\n";
         LogS.flush();
       }
