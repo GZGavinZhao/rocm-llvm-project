@@ -1218,6 +1218,46 @@ Error OffloadBundler::ListBundleIDsInFile(
   return FH->listBundleIDs(DecompressedInput);
 }
 
+// List bundle IDs. Return true if an error was found.
+Error OffloadBundler::GetBundleIDsInFile(StringRef InputFileName,
+                                         const OffloadBundlerConfig &BundlerConfig,
+                                         std::set<std::string> &BundleIDs) {
+  // Open Input file.
+  ErrorOr<std::unique_ptr<MemoryBuffer>> CodeOrErr =
+      MemoryBuffer::getFileOrSTDIN(InputFileName);
+  if (std::error_code EC = CodeOrErr.getError())
+    return createFileError(InputFileName, EC);
+
+  // Decompress the input if necessary.
+  Expected<std::unique_ptr<MemoryBuffer>> DecompressedBufferOrErr =
+      CompressedOffloadBundle::decompress(**CodeOrErr, BundlerConfig.Verbose);
+  if (!DecompressedBufferOrErr)
+    return createStringError(
+        inconvertibleErrorCode(),
+        "Failed to decompress input: " +
+            llvm::toString(DecompressedBufferOrErr.takeError()));
+
+  MemoryBuffer &DecompressedInput = **DecompressedBufferOrErr;
+
+  // Select the right files handler.
+  Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr =
+      CreateFileHandler(DecompressedInput, BundlerConfig);
+  if (!FileHandlerOrErr)
+    return FileHandlerOrErr.takeError();
+
+  std::unique_ptr<FileHandler> &FH = *FileHandlerOrErr;
+  assert(FH);
+
+  std::set<StringRef> BundleIDsRefs;
+  if (auto Error = FH->getBundleIDs(DecompressedInput, BundleIDsRefs))
+      return Error;
+
+  for (auto bundle_id : BundleIDsRefs)
+      BundleIDs.insert(bundle_id.str());
+  
+  return Error::success();
+}
+
 /// @brief Checks if a code object \p CodeObjectInfo is compatible with a given
 /// target \p TargetInfo.
 /// @link https://clang.llvm.org/docs/ClangOffloadBundler.html#bundle-entry-id

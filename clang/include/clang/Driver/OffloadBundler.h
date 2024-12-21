@@ -23,6 +23,7 @@
 #include <llvm/Support/MemoryBuffer.h>
 #include <string>
 #include <vector>
+#include <set>
 
 namespace clang {
 
@@ -63,6 +64,13 @@ public:
   static llvm::Error
   ListBundleIDsInFile(llvm::StringRef InputFileName,
                       const OffloadBundlerConfig &BundlerConfig);
+
+  // Collect available bundle IDs into a std::set. Return true if an error was
+  // found.
+  static llvm::Error
+  GetBundleIDsInFile(llvm::StringRef InputFileName,
+                     const OffloadBundlerConfig &BundlerConfig,
+                     std::set<std::string> &BundleIds);
 
   llvm::Error BundleFiles();
   llvm::Error UnbundleFiles();
