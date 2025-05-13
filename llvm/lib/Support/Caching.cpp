@@ -80,7 +80,6 @@ Expected<FileCache> llvm::localCache(const Twine &CacheNameRef,
       sys::fs::TempFile TempFile;
       std::string ModuleName;
       unsigned Task;
-      bool Committed = false;
 
       CacheStream(std::unique_ptr<raw_pwrite_stream> OS, AddBufferFn AddBuffer,
                   sys::fs::TempFile TempFile, std::string EntryPath,
@@ -89,10 +88,9 @@ Expected<FileCache> llvm::localCache(const Twine &CacheNameRef,
             AddBuffer(std::move(AddBuffer)), TempFile(std::move(TempFile)),
             ModuleName(ModuleName), Task(Task) {}
 
-      Error commit() override {
-        if (Committed)
-          return Error::success();
-        Committed = true;
+      ~CacheStream() {
+        // TODO: Manually commit rather than using non-trivial destructor,
+        // allowing to replace report_fatal_errors with a return Error.
 
         // Make sure the stream is closed before committing it.
         OS.reset();
@@ -102,12 +100,10 @@ Expected<FileCache> llvm::localCache(const Twine &CacheNameRef,
             MemoryBuffer::getOpenFile(
                 sys::fs::convertFDToNativeFile(TempFile.FD), ObjectPathName,
                 /*FileSize=*/-1, /*RequiresNullTerminator=*/false);
-        if (!MBOrErr) {
-          std::error_code EC = MBOrErr.getError();
-          return createStringError(EC, Twine("Failed to open new cache file ") +
-                                           TempFile.TmpName + ": " +
-                                           EC.message() + "\n");
-        }
+        if (!MBOrErr)
+          report_fatal_error(Twine("Failed to open new cache file ") +
+                             TempFile.TmpName + ": " +
+                             MBOrErr.getError().message() + "\n");
 
         // On POSIX systems, this will atomically replace the destination if
         // it already exists. We try to emulate this on Windows, but this may
@@ -122,10 +118,7 @@ Expected<FileCache> llvm::localCache(const Twine &CacheNameRef,
         E = handleErrors(std::move(E), [&](const ECError &E) -> Error {
           std::error_code EC = E.convertToErrorCode();
           if (EC != errc::permission_denied)
-            return createStringError(
-                EC, Twine("Failed to rename temporary file ") +
-                        TempFile.TmpName + " to " + ObjectPathName + ": " +
-                        EC.message() + "\n");
+            return errorCodeToError(EC);
 
           auto MBCopy = MemoryBuffer::getMemBufferCopy((*MBOrErr)->getBuffer(),
                                                        ObjectPathName);
@@ -138,22 +131,11 @@ Expected<FileCache> llvm::localCache(const Twine &CacheNameRef,
         });
 
         if (E)
-          return E;
+          report_fatal_error(Twine("Failed to rename temporary file ") +
+                             TempFile.TmpName + " to " + ObjectPathName + ": " +
+                             toString(std::move(E)) + "\n");
 
         AddBuffer(Task, ModuleName, std::move(*MBOrErr));
-        return Error::success();
-      }
-
-      ~CacheStream() {
-        // In Debug builds, try to track down places where commit() was not
-        // called before destruction.
-        assert(Committed);
-        // In Release builds, fall back to the previous behaviour of committing
-        // during destruction and reporting errors with report_fatal_error.
-        if (Committed)
-          return;
-        if (Error Err = commit())
-          report_fatal_error(Twine(toString(std::move(Err))));
       }
     };
 
