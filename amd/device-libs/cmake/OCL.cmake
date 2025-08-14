@@ -18,6 +18,7 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.20.0")
   cmake_policy(SET CMP0116 NEW)
 endif()
 
+include(GNUInstallDirs)
 
 if (WIN32)
   set(EXE_SUFFIX ".exe")
@@ -46,7 +47,7 @@ set (BC_EXT .bc)
 set (LIB_SUFFIX ".lib${BC_EXT}")
 set (STRIP_SUFFIX ".strip${BC_EXT}")
 set (FINAL_SUFFIX "${BC_EXT}")
-set (INSTALL_ROOT_SUFFIX "amdgcn/bitcode")
+set (INSTALL_ROOT_SUFFIX "${CMAKE_INSTALL_LIBDIR}/amdgcn/bitcode")
 
 if (NOT ROCM_DEVICE_LIBS_BITCODE_INSTALL_LOC_NEW STREQUAL "")
   set(INSTALL_ROOT_SUFFIX "${ROCM_DEVICE_LIBS_BITCODE_INSTALL_LOC_NEW}/bitcode")
