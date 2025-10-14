@@ -16,7 +16,7 @@ configure_file(AMDDeviceLibsConfig.cmake.in
   @ONLY)
 
 
-set(install_path_suffix "amdgcn/bitcode")
+set(install_path_suffix "${CMAKE_INSTALL_LIBDIR}/amdgcn/bitcode")
 
 # Generate the install-tree package.
 # We do not know the absolute path to the intall tree until we are installed,
