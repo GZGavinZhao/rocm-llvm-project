@@ -28,6 +28,7 @@
 #include "clang/Basic/DiagnosticOptions.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/VirtualFileSystem.h"
+#include <cstdlib>
 #include <cstring>
 using namespace clang;
 
@@ -147,8 +148,9 @@ void clang::ProcessWarningOptions(DiagnosticsEngine &Diags,
 
         if (Specifier.empty()) {
           if (SetDiagnostic)
-            Diags.setWarningsAsErrors(isPositive);
-          continue;
+              if (!getenv("CLANG_IGNORE_WERROR"))
+                Diags.setWarningsAsErrors(isPositive);
+              continue;
         }
 
         if (SetDiagnostic) {
