@@ -2052,7 +2052,7 @@ static void setConfigs(Ctx &ctx, opt::InputArgList &args) {
     if (ctx.arg.emachine == EM_MIPS)
       ctx.arg.sysvHash = true;
     else
-      ctx.arg.sysvHash = ctx.arg.gnuHash = true;
+      ctx.arg.gnuHash = true;
   }
 
   // Set default entry point and output file if not specified by command line or
