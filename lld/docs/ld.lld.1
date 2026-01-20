@@ -64,6 +64,11 @@ Apply link-time values for dynamic relocations.
 Only set
 .Dv DT_NEEDED
 for shared libraries if used.
+If the environment variable
+.Cm LD_AS_NEEDED
+is set, the linker will behave as if the
+.Cm --as-needed
+option is passed to the linker.
 .It Fl -auxiliary Ns = Ns Ar value
 Set the
 .Dv DT_AUXILIARY

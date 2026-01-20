@@ -2096,6 +2096,9 @@ void LinkerDriver::createFiles(opt::InputArgList &args) {
   // For --{push,pop}-state.
   std::vector<std::tuple<bool, bool, bool>> stack;
 
+  if (getenv ("LD_AS_NEEDED") != NULL)
+    ctx.arg.asNeeded = true;
+
   // -r implies -Bstatic and has precedence over -Bdynamic.
   ctx.arg.isStatic = ctx.arg.relocatable;
 
